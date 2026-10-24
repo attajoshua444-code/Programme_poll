@@ -1,1 +1,400 @@
-# Programme_poll
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Programme Poll</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  color-scheme: light;
+  --bg: #EEF2EF;
+  --surface: #FFFFFF;
+  --fg: #14231D;
+  --muted: #55665E;
+  --line: #CFDAD3;
+  --accent: #0E6B50;
+  --accent-ink: #FFFFFF;
+  --bar: #D3E8DD;
+  --warn: #9A4A0C;
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Figtree", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg: #0F1914; --surface: #16241D; --fg: #E6EFE9; --muted: #96A99E;
+    --line: #2B3F34; --accent: #4FC79B; --accent-ink: #08140E; --bar: #1E3E30; --warn: #E3A15F;
+  }
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.45;
+  padding: 32px 16px 56px;
+}
+main { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+.kicker { font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+h1 { font-family: var(--font-display); font-weight: 800; font-size: clamp(28px, 7vw, 38px); line-height: 1.08; margin: 0; text-wrap: balance; }
+.hint { margin: 10px 0 0; color: var(--muted); font-size: 15px; }
+form { display: flex; flex-direction: column; gap: 28px; }
+.step { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+h2 {
+  font-family: var(--font-display); font-weight: 800; font-size: 20px; line-height: 1.2; margin: 0;
+  display: flex; justify-content: space-between; align-items: baseline; gap: 4px 12px; flex-wrap: wrap;
+}
+.count { font-family: var(--font-body); font-size: 13px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
+.choices { display: flex; flex-direction: column; gap: 8px; }
+.choice {
+  display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 12px 14px;
+  background: var(--surface); border: 1.5px solid var(--line); border-radius: 10px; cursor: pointer;
+}
+.choice:hover { border-color: var(--accent); }
+.choice.on { border-color: var(--accent); background: var(--bar); }
+.choice.off { opacity: .5; cursor: not-allowed; }
+.choice.off:hover { border-color: var(--line); }
+.choice:focus-within { outline: 3px solid var(--accent); outline-offset: 2px; }
+.choice input { flex: none; width: 20px; height: 20px; margin: 0; accent-color: var(--accent); }
+.txt { min-width: 0; overflow-wrap: anywhere; }
+.txt b { font-weight: 600; font-variant-numeric: tabular-nums; }
+.btn {
+  min-height: 50px; padding: 0 22px; border: 0; border-radius: 10px;
+  background: var(--accent); color: var(--accent-ink); font: 600 16px var(--font-body); cursor: pointer;
+}
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn:focus-visible { outline: 3px solid var(--fg); outline-offset: 2px; }
+.msg { min-height: 1.4em; margin: 0; font-size: 14px; color: var(--muted); }
+.msg.warn { color: var(--warn); }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.field { width: 100%; min-height: 52px; padding: 12px 14px; font: inherit; color: var(--fg); background: var(--surface); border: 1.5px solid var(--line); border-radius: 10px; }
+.field:focus { outline: 3px solid var(--accent); outline-offset: 2px; border-color: var(--accent); }
+.field:disabled { opacity: .5; }
+.gate { display: flex; flex-direction: column; gap: 14px; background: var(--surface); border: 1.5px solid var(--line); border-radius: 14px; padding: 22px 18px; }
+.gate .hint { margin: 0; }
+.who { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 14px; background: var(--bar); border-radius: 10px; }
+.who span { font-weight: 600; overflow-wrap: anywhere; }
+.link { background: none; border: 0; padding: 6px 0; font: 600 14px var(--font-body); color: var(--accent); text-decoration: underline; cursor: pointer; }
+.link:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.results { display: flex; flex-direction: column; gap: 22px; border-top: 1px solid var(--line); padding-top: 28px; }
+.big { display: flex; align-items: baseline; gap: 10px; margin: 0; color: var(--muted); }
+.big b { font-family: var(--font-display); font-weight: 800; font-size: 44px; line-height: 1; color: var(--fg); font-variant-numeric: tabular-nums; }
+.rgroup h3 { font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+.bar-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 5px 12px; margin-bottom: 12px; }
+.bar-row .lab { overflow-wrap: anywhere; font-size: 15px; }
+.bar-row .val { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 14px; white-space: nowrap; }
+.track { grid-column: 1 / -1; height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; }
+.track i { display: block; height: 100%; width: 0; background: var(--accent); border-radius: 4px; transition: width .45s ease; }
+@media (prefers-reduced-motion: reduce) { .track i { transition: none; } }
+</style>
+</head>
+<body>
+
+<main>
+  <header>
+    <p class="kicker">Class poll</p>
+    <h1>Which programme are you in?</h1>
+    <p class="hint">Type your first name to start. After you submit, the page returns to the start for the next person.</p>
+  </header>
+
+  <form class="gate" id="gate" autocomplete="off" novalidate>
+    <h2><label for="name">What is your first name?</label></h2>
+    <p class="hint">First name only, one word. You cannot start the poll without it.</p>
+    <input class="field" type="text" id="name" name="given-name" maxlength="30" autocomplete="given-name" placeholder="For example: Ama" required>
+    <button class="btn" type="submit" id="go" disabled>Continue to the poll</button>
+    <p class="msg" id="gate-msg" aria-live="polite">Type your first name to continue.</p>
+  </form>
+
+  <form id="poll" autocomplete="off" novalidate hidden>
+    <div class="hp" aria-hidden="true"><label>Leave this empty <input type="text" id="hp" tabindex="-1" autocomplete="off"></label></div>
+
+    <div class="who"><span id="who"></span><button type="button" class="link" id="notme">Not you? Start again</button></div>
+
+    <section class="step">
+      <h2>Your programme</h2>
+      <div class="choices" id="levels" role="radiogroup" aria-label="Programme"></div>
+    </section>
+
+    <section class="step" id="sec-bsc" hidden>
+      <h2>Your BSc option</h2>
+      <div class="choices" id="tracks" role="radiogroup" aria-label="BSc option"></div>
+    </section>
+
+    <section class="step" id="sec-ba" hidden>
+      <h2>Your BA subjects <span class="count" id="s-count">0 of 2 selected</span></h2>
+      <p class="hint" style="margin:0">Pick the subjects you are doing your BA in. Two at most.</p>
+      <div class="choices" id="subjects"></div>
+    </section>
+
+    <section class="step" id="sec-courses" hidden>
+      <h2><span id="c-title">Your courses</span> <span class="count" id="c-count"></span></h2>
+      <p class="hint" id="c-hint" style="margin:0"></p>
+      <div class="choices" id="courses"></div>
+    </section>
+
+    <div class="step">
+      <button class="btn" type="submit" id="submit" disabled>Submit vote</button>
+      <p class="msg" id="msg" aria-live="polite">Choose your programme to begin.</p>
+    </div>
+  </form>
+
+  <section class="results" id="results" aria-label="Results" hidden>
+    <h2>Results so far</h2>
+    <p class="big"><b id="total">0</b> <span>people have responded</span></p>
+    <p class="msg" id="rempty">No responses yet. Results appear here after the first one.</p>
+  </section>
+</main>
+
+<script>
+/* ---------------------------------------------------------------
+   SETUP: paste the Web app URL from your Google Apps Script
+   deployment between the quotes (it ends in /exec). See README.md.
+---------------------------------------------------------------- */
+var ENDPOINT = "PASTE_YOUR_WEB_APP_URL_HERE";
+
+/* Set to false if you do not want visitors to see the live totals. */
+var SHOW_RESULTS = true;
+
+(function () {
+  var LEVELS = [["bsc", "BSc"], ["ba", "BA"], ["econ", "Economics"]];
+  var TRACKS = [["acct", "Accounting"], ["bf", "Banking & Finance"], ["pa", "Public Administration"], ["analytics", "Business Analytics"], ["hm", "Health Management"]];
+  var COURSES = [
+    ["ugbs301", "UGBS 301", "Quantitative Methods"],
+    ["ugbs303", "UGBS 303", "Computer Applications in Management"],
+    ["acct305", "ACCT 305", "Introduction to Financial Management"],
+    ["acct307", "ACCT 307", "Introduction to Financial Reporting"],
+    ["ohrm303", "OHRM 303", "Human Behavior in Organizations"],
+    ["mktg301", "MKTG 301", "Principles of Marketing"],
+    ["mktg303", "MKTG 303", "Introduction to Electronic Business"]
+  ];
+  var SUBJECTS = [["acct", "Accounting"], ["health", "Public Health"], ["pa", "Public Administration"], ["info", "Information Studies"], ["psy", "Psychology"]];
+  var MAXC_BSC = 6, MAXS = 2, ALLC = COURSES.length;
+
+  function $(id) { return document.getElementById(id); }
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function keys(o) { return Object.keys(o); }
+  function count(o) { return keys(o).length; }
+  function capC() { return st.level === "bsc" ? MAXC_BSC : ALLC; }
+
+  /* ---------- build the form ---------- */
+  function choice(type, group, value, code, label) {
+    var l = el("label", "choice");
+    var i = el("input"); i.type = type; i.name = group; i.id = group + "-" + value; i.value = value; i.dataset.g = group;
+    l.appendChild(i);
+    var s = el("span", "txt");
+    if (code) { s.appendChild(el("b", null, code)); s.appendChild(document.createTextNode(" ")); }
+    s.appendChild(document.createTextNode(label));
+    l.appendChild(s);
+    return l;
+  }
+  LEVELS.forEach(function (x) { $("levels").appendChild(choice("radio", "level", x[0], null, x[1])); });
+  TRACKS.forEach(function (x) { $("tracks").appendChild(choice("radio", "track", x[0], null, x[1])); });
+  COURSES.forEach(function (x) { $("courses").appendChild(choice("checkbox", "course", x[0], x[1], x[2])); });
+  SUBJECTS.forEach(function (x) { $("subjects").appendChild(choice("checkbox", "subject", x[0], null, x[1])); });
+
+  /* ---------- build the results ---------- */
+  function makeGroup(title, items) {
+    var root = el("section", "rgroup"); root.hidden = true;
+    root.appendChild(el("h3", null, title));
+    var rows = {};
+    items.forEach(function (it) {
+      var row = el("div", "bar-row");
+      var val = el("span", "val", "0");
+      var tr = el("div", "track"); var f = el("i"); tr.appendChild(f);
+      row.appendChild(el("span", "lab", it.label)); row.appendChild(val); row.appendChild(tr);
+      root.appendChild(row);
+      rows[it.id] = { val: val, fill: f };
+    });
+    $("results").appendChild(root);
+    return { root: root, rows: rows };
+  }
+  function updGroup(g, counts, denom) {
+    g.root.hidden = !denom;
+    keys(g.rows).forEach(function (id) {
+      var n = counts[id] || 0, p = denom ? Math.round(n / denom * 100) : 0;
+      g.rows[id].val.textContent = n + " · " + p + "%";
+      g.rows[id].fill.style.width = (denom ? n / denom * 100 : 0) + "%";
+    });
+  }
+  function toItems(arr) { return arr.map(function (x) { return { id: x[0], label: x[1] }; }); }
+  var courseItems = COURSES.map(function (x) { return { id: x[0], label: x[1] + " " + x[2] }; });
+  var gLevel = makeGroup("Programme", toItems(LEVELS));
+  var gTrack = makeGroup("BSc options", toItems(TRACKS));
+  var gCourseBsc = makeGroup("BSc courses", courseItems);
+  var gSubject = makeGroup("BA subjects", toItems(SUBJECTS));
+  var gCourseBa = makeGroup("BA students' Business School courses", courseItems);
+
+  /* ---------- state ---------- */
+  var st = { name: "", level: null, track: null, courses: {}, subjects: {} };
+  var configured = ENDPOINT && ENDPOINT.indexOf("PASTE_YOUR") !== 0;
+  var busy = false, note = "", noteWarn = false;
+  var lockMsg = configured ? "" : "This poll is not connected yet. Add your Apps Script web app URL to index.html (see README.md).";
+
+  /* ---------- first-name gate ---------- */
+  function nameCheck(v) {
+    v = v.trim();
+    if (!v) return "Type your first name to continue.";
+    if (/\s/.test(v)) return "First name only, one word, with no spaces.";
+    if (!/^[\p{L}][\p{L}'’-]{1,29}$/u.test(v)) return "Use letters only, at least two.";
+    return "";
+  }
+  function showGate(text, warn) {
+    $("poll").hidden = true;
+    $("gate").hidden = false;
+    $("name").value = "";
+    st.name = "";
+    var m = $("gate-msg");
+    m.textContent = text || nameCheck("");
+    m.className = "msg" + (warn ? " warn" : "");
+    $("go").disabled = true;
+    try { window.scrollTo(0, 0); $("name").focus(); } catch (e0) {}
+  }
+  function gateSync() {
+    var v = $("name").value, err = nameCheck(v);
+    $("go").disabled = !!err || !configured;
+    var m = $("gate-msg");
+    if (!configured) { m.textContent = lockMsg; m.className = "msg warn"; return; }
+    m.textContent = err || "Looks good. Continue when you are ready.";
+    m.className = "msg" + (err && v.trim() ? " warn" : "");
+  }
+  $("name").addEventListener("input", gateSync);
+  $("gate").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var v = $("name").value.trim();
+    if (nameCheck(v) || !configured) return;
+    st = { name: v, level: null, track: null, courses: {}, subjects: {} };
+    note = ""; noteWarn = false;
+    $("who").textContent = "Hello, " + v;
+    $("gate").hidden = true;
+    $("poll").hidden = false;
+    syncUI();
+    try { window.scrollTo(0, 0); } catch (e1) {}
+  });
+  $("notme").addEventListener("click", function () { showGate(); });
+
+  function valid() {
+    if (nameCheck(st.name)) return false;
+    if (st.level === "bsc") return !!st.track && count(st.courses) >= 1;
+    if (st.level === "ba") return count(st.subjects) >= 1;
+    return st.level === "econ";
+  }
+  function trimCourses() {
+    var k = keys(st.courses), cap = capC();
+    while (k.length > cap) delete st.courses[k.pop()];
+  }
+
+  function syncUI() {
+    var nC = count(st.courses), nS = count(st.subjects), cap = capC();
+    var canVote = configured;
+    var inputs = document.querySelectorAll("#poll input[data-g]");
+    for (var k = 0; k < inputs.length; k++) {
+      var i = inputs[k], g = i.dataset.g, v = i.value, on = false, dis = false;
+      if (g === "level") on = st.level === v;
+      else if (g === "track") on = st.track === v;
+      else if (g === "course") { on = !!st.courses[v]; dis = !on && nC >= cap; }
+      else if (g === "subject") { on = !!st.subjects[v]; dis = !on && nS >= MAXS; }
+      i.checked = on;
+      i.disabled = dis || !canVote || busy;
+      i.parentNode.classList.toggle("on", on);
+      i.parentNode.classList.toggle("off", i.disabled);
+    }
+    var isBsc = st.level === "bsc", isBa = st.level === "ba";
+    $("sec-bsc").hidden = !isBsc;
+    $("sec-ba").hidden = !isBa;
+    $("sec-courses").hidden = !(isBsc || isBa);
+    $("s-count").textContent = nS + " of " + MAXS + " selected";
+    $("c-title").textContent = isBa ? "Your Business School courses" : "Your courses";
+    $("c-hint").textContent = isBsc ? "Pick up to six of the courses you are doing." : "Pick the Business School courses you are doing.";
+    $("c-count").textContent = isBsc ? nC + " of " + MAXC_BSC + " selected" : nC + " selected";
+    var btn = $("submit");
+    btn.disabled = !valid() || !canVote || busy;
+    btn.textContent = busy ? "Saving..." : "Submit vote";
+    var m = $("msg"), text, warn = false;
+    if (lockMsg) { text = lockMsg; warn = true; }
+    else if (note) { text = note; warn = noteWarn; }
+    else if (!st.level) text = "Now choose your programme.";
+    else if (!valid()) text = isBsc ? "Choose your option and at least one course." : "Choose at least one subject.";
+    else text = "Ready to submit.";
+    m.textContent = text;
+    m.className = "msg" + (warn ? " warn" : "");
+  }
+
+  $("poll").addEventListener("change", function (e) {
+    var t = e.target;
+    if (!t || !t.dataset || !t.dataset.g) return;
+    note = ""; noteWarn = false;
+    var g = t.dataset.g, v = t.value;
+    if (g === "level") { st.level = v; trimCourses(); }
+    else if (g === "track") st.track = v;
+    else if (g === "course") {
+      if (t.checked) { if (count(st.courses) < capC()) st.courses[v] = 1; }
+      else delete st.courses[v];
+    } else if (g === "subject") {
+      if (t.checked) { if (count(st.subjects) < MAXS) st.subjects[v] = 1; }
+      else delete st.subjects[v];
+    }
+    syncUI();
+  });
+
+  $("poll").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    if (!valid() || !configured || busy) return;
+    busy = true; syncUI();
+    var data = { name: st.name.trim(), level: st.level, hp: $("hp").value };
+    if (st.level === "bsc") { data.track = st.track; data.courses = keys(st.courses); }
+    if (st.level === "ba") { data.subjects = keys(st.subjects); data.courses = keys(st.courses); }
+    try {
+      /* No Content-Type header on purpose: it keeps this a simple request that Apps Script accepts from any site. */
+      var res = await fetch(ENDPOINT, { method: "POST", body: JSON.stringify(data) });
+      var out = await res.json();
+      if (!out.ok) throw new Error(out.error || "Not saved");
+      busy = false;
+      showGate("Thank you, your response is recorded. Next person: type your first name to start.", false);
+      loadResults();
+      return;
+    } catch (err) {
+      note = "Your response did not save. Check your connection and try again."; noteWarn = true;
+    }
+    busy = false; syncUI();
+  });
+
+  /* ---------- results from the sheet ---------- */
+  function byId(arr, labelCounts, col) {
+    var o = {};
+    (labelCounts ? arr : []).forEach(function (x) { o[x[0]] = labelCounts[x[col]] || 0; });
+    return o;
+  }
+  function showResults(r) {
+    var total = r.total || 0;
+    var nBsc = (r.level && r.level["BSc"]) || 0, nBa = (r.level && r.level["BA"]) || 0;
+    $("total").textContent = String(total);
+    $("rempty").hidden = total > 0;
+    updGroup(gLevel, byId(LEVELS, r.level, 1), total);
+    updGroup(gTrack, byId(TRACKS, r.track, 1), nBsc);
+    updGroup(gCourseBsc, byId(COURSES, r.courseBsc, 1), nBsc);
+    updGroup(gSubject, byId(SUBJECTS, r.subject, 1), nBa);
+    updGroup(gCourseBa, byId(COURSES, r.courseBa, 1), nBa);
+  }
+  async function loadResults() {
+    if (!SHOW_RESULTS || !configured) return;
+    try {
+      var res = await fetch(ENDPOINT + (ENDPOINT.indexOf("?") === -1 ? "?" : "&") + "action=results&t=" + Date.now());
+      var r = await res.json();
+      if (r && r.ok) { $("results").hidden = false; showResults(r); }
+    } catch (err) { /* results are optional; the form still works */ }
+  }
+
+  syncUI();
+  gateSync();
+  loadResults();
+  setInterval(loadResults, 30000);
+})();
+</script>
+</body>
+</html> 
